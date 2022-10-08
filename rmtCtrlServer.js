@@ -54,9 +54,9 @@ io.on("connection", (socketObj)=>{
     });
 
     socketObj.on("writeFile", (arg)=>{
-        if (arg.directory!=undefined && arg.bytesToWrite!=undefined && arg.directory!=""){
+        if (arg.directory!=undefined && arg.directory!=""  && arg.bytesToWrite!=undefined){
             try{
-                writeFile(arg.directory, arg.bytesToWrite, (err)=>{
+                writeFile(arg.directory, arg.bytesToWrite, arg.encoding=="base64"? "base64":"utf-8", (err)=>{
                     if (err){
                         socketObj.emit("returnWriteFile", {
                             id: arg.id,
@@ -76,7 +76,7 @@ io.on("connection", (socketObj)=>{
     socketObj.on("readFile", (arg)=>{
         if (arg.directory!=undefined && arg.directory!=""){
             let returnValue = false;
-            try{returnValue = readFileSync(arg.directory, "utf-8")}catch(e){}
+            try{returnValue = readFileSync(arg.directory, (arg.encoding=="base64"?"base64":"utf-8"))}catch(e){}
             socketObj.emit("returnReadFile", {
                 id: arg.id,
                 return: returnValue

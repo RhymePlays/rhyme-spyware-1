@@ -84,14 +84,14 @@
             })
         }
         function writeFile(){
-            socket.emit("writeFile", {id: getID(), directory: document.getElementById("input").value, bytesToWrite: prompt()})
+            socket.emit("writeFile", {id: getID(), directory: document.getElementById("input").value, bytesToWrite: prompt("bytesToWrite"), encoding: (prompt("base64? (yes/no)")=="yes"? "base64":"utf-8")})
             socket.on("returnWriteFile", (arg)=>{
                 if(arg.return){displayAppend("File Successfully Written", "success")}
                 else{displayAppend("Error Writting File", "error")}
             })
         }
         function readFile(){
-            socket.emit("readFile", {id: getID(), directory: document.getElementById("input").value})
+            socket.emit("readFile", {id: getID(), directory: document.getElementById("input").value, encoding: (prompt("base64? (yes/no)")=="yes"? "base64":"utf-8")})
             socket.on("returnReadFile", (arg)=>{
                 if(arg.return!=false){
                     displayAppend(arg.return, "success")
