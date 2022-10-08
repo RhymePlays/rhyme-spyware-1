@@ -2,7 +2,8 @@
   "dependencies": {
     "clipboardy": "^3.0.0",
     "screenshot-desktop": "^1.12.7",
-    "socket.io": "^4.5.1"
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.2"
   },
   "scripts": {
     "build": "nexe rmtCtrlServer.js --build='https://github.com/nexe/nexe/releases/download/v3.3.3/windows-x64-14.5.0'"

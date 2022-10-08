@@ -1,2 +1,2 @@
 @echo off
-node.exe rmtCtrlServer.js
+node.exe rmtCtrlClient.js
