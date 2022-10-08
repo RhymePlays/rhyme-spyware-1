@@ -8,7 +8,7 @@ const { exec } = require('child_process');
 const screenshot = require('screenshot-desktop')
 
 // Init Socket
-let socketObj = io(`ws://rhymesync-server.herokuapp.com:80`)
+let socketObj = io(`ws://IP:PORT`)
 
 socketObj.on("connectionEstablished", (arg)=>{
     socketObj.emit("sendDataToDebuggers", {type: "connectionEstablished"});

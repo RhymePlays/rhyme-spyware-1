@@ -14,7 +14,7 @@
             currentID: "",
         }
 
-        const socket = io(`ws://rhymesync-server.herokuapp.com:80`);
+        const socket = io(`ws://IP:PORT`);
         socket.on("connectionEstablished", (arg)=>{displayAppend("Connected to server!", "success")})
         var reader = new FileReader();
 

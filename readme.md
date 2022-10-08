@@ -1,4 +1,5 @@
 # RhymeSpyware1
+### Please note that this `readme` is outdated. I'll update it soon enough.
 ### How to use
 1. Download the **Windows Binary** for **node**. And extract it.
 2. Copy the files from the **Repo** to the folder where you extracted node.
