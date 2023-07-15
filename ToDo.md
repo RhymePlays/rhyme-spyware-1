@@ -1,4 +1,4 @@
-Problem: There is currently no way to send commands to a specific rmtCtrl node in the RhymeSync Network. Sending a command send it to all the nodes connected to the network, which is not ideal.
+Problem: There is currently no way to send commands to a specific rmtCtrl node in the RhymeSync Network. Sending a command sends it to all the nodes connected to the network, which is not ideal.
 Fix: Have a way of identifiying nodes that belong to a specific program (Idealy by the server without pinging every node.)
 Implementation:
 	1) Have rmtCtrl nodes (and other nodes of programs) register which program they belong to (in this case it'd be "rmtCtrl") to the server upon handshake.
